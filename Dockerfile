@@ -1,0 +1,37 @@
+FROM python:3.12-slim
+
+ENV PYTHONDONTWRITEBYTECODE=1 \
+    PYTHONUNBUFFERED=1 \
+    PIP_NO_CACHE_DIR=1 \
+    PIP_INDEX_URL=https://repo.huaweicloud.com/repository/pypi/simple \
+    HF_HOME=/models \
+    HF_ENDPOINT=https://hf-mirror.com \
+    HF_HUB_DISABLE_XET=1
+
+RUN sed -i 's|deb.debian.org|repo.huaweicloud.com|g' /etc/apt/sources.list.d/debian.sources \
+    && apt-get update \
+    && apt-get install -y --no-install-recommends \
+       ca-certificates \
+       ffmpeg \
+       fonts-noto-cjk \
+    && rm -rf /var/lib/apt/lists/*
+
+WORKDIR /app
+COPY requirements.txt .
+RUN pip install --upgrade pip \
+    && pip install -r requirements.txt
+
+COPY app ./app
+COPY scripts ./scripts
+RUN useradd --create-home --uid 10001 liveclip \
+    && mkdir -p /app/data /app/secrets /models \
+    && chown -R liveclip:liveclip /app /models
+
+USER liveclip
+EXPOSE 8000
+
+HEALTHCHECK --interval=30s --timeout=5s --start-period=20s --retries=3 \
+  CMD ["python", "-c", "import urllib.request; urllib.request.urlopen('http://127.0.0.1:8000/healthz', timeout=3)"]
+
+CMD ["uvicorn", "app.main:app", "--host", "0.0.0.0", "--port", "8000", "--workers", "1"]
+

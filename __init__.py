@@ -1,0 +1,2 @@
+"""LiveClip application package."""
+

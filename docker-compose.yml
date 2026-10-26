@@ -1,0 +1,24 @@
+services:
+  liveclip:
+    build: .
+    container_name: liveclip
+    init: true
+    restart: unless-stopped
+    stop_grace_period: 60s
+    env_file:
+      - .env
+    environment:
+      HF_ENDPOINT: https://hf-mirror.com
+      HF_HUB_DISABLE_XET: "1"
+    ports:
+      - "${BIND_ADDRESS:-0.0.0.0}:8000:8000"
+    volumes:
+      - ./app:/app/app:ro
+      - ./data:/app/data
+      - ./secrets:/app/secrets:ro
+      - whisper-models:/models
+    shm_size: "512mb"
+
+volumes:
+  whisper-models:
+

@@ -1,0 +1,149 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>LiveClip · 抖音直播录像与切片</title>
+    <link rel="stylesheet" href="/static/app.css?v=4" />
+  </head>
+  <body>
+    <header class="topbar">
+      <div>
+        <p class="eyebrow">Single-channel studio</p>
+        <h1>LiveClip</h1>
+      </div>
+      <div class="status-pill" id="service-status">
+        <span class="dot"></span>连接中
+      </div>
+    </header>
+
+    <main>
+      <section class="runtime-banner" id="runtime-banner">
+        <span class="runtime-dot"></span>
+        <div class="runtime-copy">
+          <strong id="runtime-label">正在确认录制状态…</strong>
+          <span id="runtime-detail"></span>
+        </div>
+        <div class="storage-summary">
+          <div class="storage-head">
+            <span>磁盘空间</span>
+            <strong id="disk-free">-- GB 可用</strong>
+          </div>
+          <div class="disk-track">
+            <span id="disk-usage-bar"></span>
+          </div>
+          <small id="disk-note">正在读取磁盘容量…</small>
+        </div>
+      </section>
+
+      <section class="hero card">
+        <div>
+          <p class="eyebrow">LIVE TO CLIP</p>
+          <h2>输入直播间，开始自动录制</h2>
+          <p class="muted">
+            仅处理你已获授权保存的直播内容。当前版本限制单路录像，录制完成后由 AI 识别高光、生成字幕并输出 9:16 短视频。
+          </p>
+        </div>
+        <form id="start-form" class="start-form">
+          <label>
+            直播间地址
+            <input
+              id="live-url"
+              name="url"
+              type="url"
+              required
+              placeholder="https://live.douyin.com/..."
+              autocomplete="off"
+            />
+          </label>
+          <label>
+            任务名称（可选）
+            <input
+              id="live-title"
+              name="title"
+              maxlength="80"
+              placeholder="例如：周一场观"
+            />
+          </label>
+          <button class="primary" type="submit" disabled>开始录像</button>
+        </form>
+      </section>
+
+      <section class="toolbar">
+        <div>
+          <p class="eyebrow">RECORDINGS</p>
+          <h2>任务列表</h2>
+        </div>
+        <div class="toolbar-actions">
+          <button class="ghost" id="cleanup-button" type="button">清理已结束任务</button>
+          <button class="ghost" id="refresh-button" type="button">刷新</button>
+        </div>
+      </section>
+
+      <div id="message" class="message" hidden></div>
+      <section id="recordings" class="recording-list">
+        <div class="empty card">正在读取任务…</div>
+      </section>
+    </main>
+
+    <template id="recording-template">
+      <article class="recording card">
+        <div class="recording-head">
+          <div>
+            <div class="recording-title"></div>
+            <div class="recording-meta"></div>
+          </div>
+          <div class="badge"></div>
+        </div>
+        <div class="progress-track" hidden>
+          <span></span>
+        </div>
+        <div class="progress-meta">
+          <p class="stage muted"></p>
+          <strong class="progress-percent" hidden>0%</strong>
+        </div>
+        <p class="error" hidden></p>
+        <div class="actions">
+          <button class="danger stop-button" type="button">停止录像</button>
+          <form class="clip-form">
+            <label>
+              数量
+              <select class="clip-count">
+                <option>2</option>
+                <option selected>3</option>
+                <option>4</option>
+                <option>5</option>
+              </select>
+            </label>
+            <label>
+              单条秒数
+              <select class="clip-duration">
+                <option value="30,60">30–60 秒</option>
+                <option value="20,90" selected>20–90 秒</option>
+                <option value="45,120">45–120 秒</option>
+              </select>
+            </label>
+            <button class="secondary process-button" type="submit">AI 生成切片</button>
+          </form>
+          <a class="ghost link video-link" hidden>下载录像</a>
+          <button class="ghost delete-button" type="button">删除任务</button>
+        </div>
+        <div class="clips" hidden></div>
+      </article>
+    </template>
+
+    <template id="clip-template">
+      <article class="clip">
+        <video controls preload="metadata"></video>
+        <div class="clip-body">
+          <strong class="clip-title"></strong>
+          <p class="clip-meta muted"></p>
+          <p class="clip-reason"></p>
+          <a class="download" download>下载 MP4</a>
+        </div>
+      </article>
+    </template>
+    <script src="/static/app.js?v=4"></script>
+  </body>
+</html>
+
